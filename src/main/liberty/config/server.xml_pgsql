@@ -31,16 +31,16 @@
 
 	<connectionManager agedTimeout="-1" connectionTimeout="0" id="conMgr1" maxIdleTime="-1" maxPoolSize="100" minPoolSize="100" purgePolicy="FailingConnectionOnly" reapTime="-1"/>
 
-	<jdbcDriver id="DerbyEmbedded" libraryRef="DerbyLib"/>
-	<library filesetRef="DerbyFileset" id="DerbyLib"/>
-	<fileset dir="${shared.resource.dir}/DerbyLibs" id="DerbyFileset" includes="derby-10.13.1.1.jar"/>
+	<jdbcDriver id="PostgreSQL" libraryRef="PostgresLib"/>
+	<library id="PostgresLib" filesetRef="PostgresFileset"/>
+	<fileset id="PostgresFileset" dir="${shared.resource.dir}/PostgresLibs" includes="postgresql-42.2.9.jar"/>
 
-	<authData id="TradeDataSourceAuthData" password="db_password" user="db_username"/>
-	<authData id="TradeAdminAuthData" password="db_password" user="db_username"/>
+    <authData id="TradeDataSourceAuthData" user="${env.dbUser}" password="${env.dbPass}"/>
+    <authData id="TradeAdminAuthData" user="${env.dbUser}" password="${env.dbPass}"/>
 
-	<dataSource connectionManagerRef="conMgr1" id="DefaultDataSource" isolationLevel="TRANSACTION_READ_COMMITTED" jdbcDriverRef="DerbyEmbedded" jndiName="jdbc/TradeDataSource" statementCacheSize="60">
-		<properties.derby.embedded createDatabase="create" databaseName="${shared.resource.dir}/data/tradedb" password="db_password" user="db_username"/>
-	</dataSource>
+    <dataSource jndiName="jdbc/TradeDataSource" jdbcDriverRef="PostgreSQL" id="DefaultDataSource" connectionManagerRef="conMgr1" statementCacheSize="60" isolationLevel="TRANSACTION_READ_COMMITTED" type="javax.sql.ConnectionPoolDataSource">
+      <properties serverName="${env.tradeDbHost}" portNumber="${env.tradeDbPort}" databaseName="${env.tradeDbName}" user="${env.dbUser}" password="${env.dbPass}" defaultAutoCommit="false"/>
+    </dataSource>
 
 	<messagingEngine id="defaultME">
 		<queue id="TradeBrokerQueue"/>
